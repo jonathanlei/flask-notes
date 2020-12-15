@@ -1,0 +1,6 @@
+li {
+    display: flex;
+}
+li *{
+    margin-right: 10px;
+}

@@ -1,7 +1,7 @@
 from flask import Flask, render_template, redirect, session, flash
 from flask_debugtoolbar import DebugToolbarExtension
-from models import connect_db, db, User
-from forms import RegisterUserForm, LoginForm
+from models import connect_db, db, User, Note
+from forms import RegisterUserForm, LoginForm, AddNoteForm, EditNoteForm
 
 
 app = Flask(__name__)
@@ -87,3 +87,69 @@ def get_user(username):
     else:
         user = User.query.get(username)
         return render_template("show_user.html", user=user)
+
+
+@app.route("/users/<username>/delete", methods=["POST"])
+def delete_user(username):
+    """ find user and delete from the database,
+    clear session data and redirect to / """
+    if session.get("user_id") != username:
+        flash("You must be logged in to see this page!")
+        return redirect("/")
+    user = User.query.get_or_404(username)
+    # redefine relationship to [], which way better?
+    db.session.query(Note).filter(Note.owner == user.username).delete()
+    db.session.delete(user)
+    db.session.commit()
+    session.pop("user_id", None)
+    return redirect("/")
+
+
+
+@app.route("/users/<username>/notes/add", methods=["GET", "POST"])
+def add_note(username):
+    """ add note for user given username: produce form & handle form submission."""
+    if session.get("user_id") != username:
+        flash("You must be logged in to see this page!")
+        return redirect("/")
+    form = AddNoteForm()
+    if form.validate_on_submit():
+        title = form.title.data
+        content = form.content.data
+        note = Note(title=title, content=content, owner=username)
+        db.session.add(note)
+        db.session.commit()
+        return redirect(f"/users/{username}")
+    else:
+        return render_template("add_note.html", form=form)
+    
+
+@app.route("/notes/<int:note_id>/update", methods=["GET", "POST"])
+def update_note(note_id):
+    """ update note for the given note id: produce form & handle form submission."""
+    note = Note.query.get_or_404(note_id)
+    if session.get("user_id") != note.owner:
+        flash("You must be logged in to see this page!")
+        return redirect("/")
+    
+    form = EditNoteForm(obj=note)
+    if form.validate_on_submit():
+        note.title = form.title.data
+        note.content = form.content.data
+        db.session.commit()
+        return redirect(f"/users/{note.owner}")
+    else:
+        return render_template("edit_note.html", form=form, note=note)
+
+@app.route("/notes/<int:note_id>/delete", methods=["POST"])
+def delete_note(note_id):
+    """ delete a note if the user is verified, and redirect to users page """
+    note = Note.query.get_or_404(note_id)
+    if session.get("user_id") != note.owner:
+        flash("You must be logged in to see this page!")
+        return redirect("/")
+    
+    db.session.delete(note)
+    db.session.commit()
+
+    return redirect(f"/users/{note.owner}")
