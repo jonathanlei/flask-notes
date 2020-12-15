@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}
+User Info
+{% endblock %}
+
+{% block content %}
+
+<h1>{{ user.username }}</h1>
+<p>Email: {{ user.email }}</p>
+<p>First Name: {{ user.first_name }}</p>
+<p>Last Name: {{ user.last_name }}</p>
+
+<form action="">
+  <button type="submit" formaction="/users/{{ user.username }}/delete" formmethod="POST">Delete User</button>
+</form>
+
+<h2>User Notes:</h2>
+<ul id="notesList"></ul>
+
+<form action="">
+  <button type="submit" formaction="/users/{{ user.username }}/notes/add" formmethod="POST">Add Note</button>
+</form>
+
+
+{% endblock %}
