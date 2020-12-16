@@ -11,8 +11,9 @@ User Info
 <p>First Name: {{ user.first_name }}</p>
 <p>Last Name: {{ user.last_name }}</p>
 
-<form action="">
-  <button type="submit" formaction="/users/{{ user.username }}/delete" formmethod="POST">Delete User</button>
+<form action="/users/{{ user.username }}/delete" method="POST">
+  {{ delete_user_form.hidden_tag() }}
+  <button type="submit">Delete User</button>
 </form>
 
 <h2>User Notes:</h2>
@@ -20,19 +21,22 @@ User Info
   {% for note in user.notes%}
   <li>
       <a href="/notes/{{note.id}}/update"> <i class="fas fa-edit"> </i></a>
+
       <form action="/notes/{{note.id}}/delete" method="POST">
-      <button>
-        <i class="fas fa-trash-alt"></i>
-      </button>
+        {{ delete_note_form.hidden_tag() }}
+        <button type="submit">
+          <i class="fas fa-trash-alt"></i>
+        </button>
       </form>
+
       <h4> {{note.title}}</h4>
       <p>{{note.content}}</p>
   </li>
   {% endfor %}
 </ul>
 
-<form action="">
-  <button type="submit" formaction="/users/{{ user.username }}/notes/add" >Add Note</button>
+<form action="/users/{{ user.username }}/notes/add">
+  <button type="submit" >Add Note</button>
 </form>
 
 

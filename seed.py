@@ -10,7 +10,16 @@ user = User.register(username="testUser",
                      email="testuser@testuser.com",
                      first_name="testFirst",
                      last_name="testLast")
-db.session.add(user)
+
+user2 = User.register(username="alan",
+                     password="testing",
+                     email="alantest@google.com",
+                     first_name="Alan",
+                     last_name="Test")
+
+
+
+db.session.add_all([user, user2])
 db.session.commit()
 user.notes.append(Note(title="testTitle", content="testContent"))
 db.session.commit()

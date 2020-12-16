@@ -39,3 +39,17 @@ class EditNoteForm(FlaskForm):
                         validators=[InputRequired(), Length(max=100)])
     content = TextAreaField("Content",
                             validators=[InputRequired()])
+
+
+class DeleteUserForm(FlaskForm):
+    """ Form for deleting user 
+
+    Only has hidden CSRF input field
+    """
+
+
+class DeleteNoteForm(FlaskForm):
+    """ Form for deleting user's note 
+    
+    Only has hidden CSRF input field
+    """
